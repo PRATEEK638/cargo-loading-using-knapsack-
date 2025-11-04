@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargo Loading Optimizer - Knapsack Problem Visualizer</title>
+    <meta name="description" content="Solve cargo loading problems using fractional knapsack algorithms. Visualize DP, memoization, recursion, and branch & bound approaches.">
+    
+    <!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center gap-4 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <h1 class="text-4xl font-bold">Cargo Loading Optimizer</h1>
+            </div>
+            <p class="text-xl text-blue-100">Solve complex logistics problems using the Knapsack algorithm. Maximize profit by optimally loading cargo with limited truck capacity.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Data Presets Section -->
+        <section id="presets-section" class="mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Data Presets</h2>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Load pre-configured datasets for different scenarios</p>
+                <div id="presets-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Presets will be loaded here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Input Section -->
+        <section id="input-section" class="mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Input Data</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Capacity Input -->
+                    <div>
+                        <label for="capacity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Truck Capacity (kg)
+                        </label>
+                        <input 
+                            type="number" 
+                            id="capacity" 
+                            value="50" 
+                            min="1" 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        >
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="flex items-end gap-2">
+                        <button onclick="addItem()" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
+                            Add Item
+                        </button>
+                        <button onclick="clearItems()" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition">
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Items Table -->
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Cargo Items</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Item Name</th>
+                                    <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Weight (kg)</th>
+                                    <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Value ($)</th>
+                                    <th class="px-4 py-2 text-left text-gray-700 dark:text-gray-300">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-tbody">
+                                <!-- Items will be added here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="items-count" class="text-sm text-gray-600 dark:text-gray-400 mt-2">0 items added</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Algorithm Selection Section -->
+        <section id="algorithm-section" class="mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Select Algorithm</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="algorithm-grid">
+                    <!-- Algorithms will be loaded here by JavaScript -->
+                </div>
+
+                <div class="mt-6 flex gap-4">
+                    <button onclick="solveKnapsack()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition text-lg">
+                        Solve Problem
+                    </button>
+                    <button onclick="compareAlgorithms()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition text-lg">
+                        Compare All Algorithms
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Algorithm Recommendation -->
+        <section id="recommendation-section" class="mb-8 hidden">
+            <div class="bg-blue-50 dark:bg-blue-900 rounded-lg shadow-lg p-6 border-2 border-blue-200 dark:border-blue-700">
+                <div class="flex items-start gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-blue-900 dark:text-blue-100 mb-2">💡 Recommended Algorithm</h3>
+                        <div id="recommendation-content"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="mb-8 hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Results</h2>
+                    <div class="flex gap-2">
+                        <button onclick="exportJSON()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition text-sm">
+                            Export JSON
+                        </button>
+                        <button onclick="exportCSV()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition text-sm">
+                            Export CSV
+                        </button>
+                    </div>
+                </div>
+                
+                                <div id="results-content">
+                    <!-- Results will be displayed here -->
+                </div>
+                
+                <!-- Charts Section -->
+                <div id="charts-section" class="mt-6 hidden">
+                    <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">📊 Visualizations</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Selected Items - Value Distribution</h4>
+                            <canvas id="valueChart"></canvas>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Selected Items - Weight Distribution</h4>
+                            <canvas id="weightChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Comparison Results Section -->
+        <section id="comparison-section" class="mb-8 hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Algorithm Comparison</h2>
+                                <div id="comparison-content">
+                    <!-- Comparison results will be displayed here -->
+                </div>
+                
+                <!-- Comparison Charts -->
+                <div id="comparison-charts" class="mt-6 hidden">
+                    <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">📊 Performance Comparison</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Execution Time Comparison (ms)</h4>
+                            <canvas id="timeComparisonChart"></canvas>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Profit Comparison ($)</h4>
+                            <canvas id="profitComparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-8 flex flex-col items-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mb-4"></div>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">Computing optimal solution...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 Cargo Loading Optimizer. Educational tool for knapsack algorithm visualization.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

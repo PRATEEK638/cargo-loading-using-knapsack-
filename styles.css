@@ -1,0 +1,107 @@
+/* Custom styles for Cargo Loading Optimizer */
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Algorithm card hover effects */
+.algorithm-card {
+    transition: all 0.3s ease;
+}
+
+.algorithm-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Selected algorithm highlight */
+.algorithm-selected {
+    border: 2px solid #3b82f6;
+    background-color: #eff6ff;
+}
+
+.dark .algorithm-selected {
+    background-color: #1e3a8a;
+    border-color: #60a5fa;
+}
+
+/* Table styles */
+table {
+    border-spacing: 0;
+}
+
+table th,
+table td {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dark table th,
+.dark table td {
+    border-bottom: 1px solid #374151;
+}
+
+/* Results card */
+.result-card {
+    transition: all 0.3s ease;
+}
+
+.result-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge styles */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.badge-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.badge-info {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* Dark mode badge overrides */
+.dark .badge-success {
+    background-color: #166534;
+    color: #dcfce7;
+}
+
+.dark .badge-warning {
+    background-color: #92400e;
+    color: #fef3c7;
+}
+
+.dark .badge-info {
+    background-color: #1e40af;
+    color: #dbeafe;
+}
